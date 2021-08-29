@@ -7,6 +7,7 @@ function App() {
   return (
     <div className="app">
       <Header />
+      {/* configuring BE */}
       <TinderCards />
       <SwipeButtons />
     </div>
