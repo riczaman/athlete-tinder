@@ -3,6 +3,7 @@ import TinderCard from 'react-tinder-card'
 import {useState} from 'react'
 
 const TinderCards = () => {
+    //will pull from the backend after using fetch 
     const [athletes, setAthletes] = useState([
         {
             name: "Candace Parker",
