@@ -9,7 +9,7 @@ function App() {
       <Header />
       {/* configuring BE */}
       <TinderCards />
-      <SwipeButtons />
+      {/* <SwipeButtons /> */}
     </div>
   );
 }
