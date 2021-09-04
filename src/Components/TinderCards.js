@@ -1,19 +1,15 @@
 import '../styles/TinderCards.css';
 import TinderCard from 'react-tinder-card'
-import {useState, useEffect, useMemo, React} from 'react'
+import {useState, useEffect, React} from 'react'
 import SwipeButtons from '../Components/SwipeButtons';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const TinderCards = () => {
     //will pull from the backend after using fetch 
     const [athletes, setAthletes] = useState([]);
-    // const childRefs = useMemo(() => Array(athletes.length).fill(0).map(i => React.createRef()), [])
-    // const alreadyRemoved = []
-    //pull random 4-6 until they refresh
-    //refresh new 4 
-    //heart = swipe right 
-    //x swipe left 
-    //add element or div that appears when they dnt have anymore cards
-    //instead incorporate sweet alerts for each of the button clicks in swipebuttons
+    const [trackCards, setTrackCards] = useState(0);
+    const [swipes, setSwipes] = useState(0); 
     
     useEffect(()=>{
         getTinderProfiles(); 
@@ -23,34 +19,30 @@ const TinderCards = () => {
         const res = await fetch("http://localhost:8000/tinder/card"); 
         const data = await res.json();
 
-        setAthletes(data); 
-    }
+        let item1 = data[Math.floor(Math.random() * data.length)];
+        let item2 = data[Math.floor(Math.random() * data.length)];
+        let item3 = data[Math.floor(Math.random() * data.length)];
+        let item4 = data[Math.floor(Math.random() * data.length)];
 
-    const swiped = (direction, name) =>{
-        console.log(`You swiped ${direction} on ${name}`)
+        const randomData = [item1, item2, item3, item4]
+        setTrackCards(randomData.length);
+        setAthletes(randomData); 
     }
 
     const outOfFrame = (name) => {
-        console.log(`Yikes! You swiped left on: ${name}`)
+        console.log(`${name} has left the screen`)
     }
 
-    // const swipe = (dir) => {
-    //     console.log(`The direction is: ${dir}`)
-    //     const cardsLeft = athletes.filter(athlete => !alreadyRemoved.includes(athlete.name))
-    //     console.log(`Value of cards left: ${cardsLeft}`);
-    //     if (cardsLeft.length) {
-    //       const toBeRemoved = cardsLeft[cardsLeft.length - 1].name // Find the card object to be removed
-    //       console.log(`Removed Card Index: ${toBeRemoved}`);
-    //       const index = athletes.map(athlete => athlete.name).indexOf(toBeRemoved) // Find the index of which to make the reference to
-    //       console.log(`index: ${index}`);
-    //       alreadyRemoved.push(toBeRemoved) // Make sure the next card gets removed next time if this card do not have time to exit the screen
-    //       childRefs[index].current.swipe(dir) // Swipe the card!
-    //     }
-    //   }
+    const refreshOptions = async () => {
+        setSwipes(0);
+        await getTinderProfiles(); 
+    }
 
-      const bv = () =>{
-          console.log('holy')
-      }
+    const reject = () => toast(`😞 Your really going to swipe left?`);
+
+    const like = () => toast(`😍 I have a feeling you're in love!`);
+        
+    const premiumFeatures = () => toast(`🤑 Premium features coming soon.`);
 
     return (
         <div className="tinderCards">
@@ -60,14 +52,33 @@ const TinderCards = () => {
                     className="swipe"
                     key={athlete.name}
                     preventSwipe={['up', 'down']}
-                    onSwipe={(dir)=>swiped(dir, athlete.name)}
+                    onSwipe={() => setSwipes(prevSwipes => prevSwipes + 1)}
                     onCardLeftScreen={()=> outOfFrame(athlete.name)}>
                     <div style={{ backgroundImage: `url('${athlete.imgUrl}')` }} className="card">
                         <h3>{athlete.name}</h3>
                     </div>
                 </TinderCard>)}
+                {swipes === trackCards && 
+                    <TinderCard
+                        className="swipe"
+                        preventSwipe={['left', 'right', 'up', 'down']}>
+                        <div style={{ backgroundImage: `url('https://cdn.dribbble.com/users/246611/screenshots/10742148/media/d64b1bc4087cbf2c574a1688ecabc8ee.png?compress=1&resize=400x300')` }} className="card">
+                        </div>
+                    </TinderCard>
+                }
             </div>
-            <SwipeButtons brick={bv}/>
+            <ToastContainer
+                position="top-center"
+                autoClose={2000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
+            <SwipeButtons Refresh={refreshOptions} Reject={reject} Like={like} Premium={premiumFeatures}/>
         </div>
     )
 }
